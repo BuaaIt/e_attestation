@@ -31,6 +31,8 @@ const auth = async (req, res) => {
                     process.env.REFRESH_TOKEN_SECRET,
                     { expiresIn: '1d' }
                 );
+                //store the refresh token with the current user on db 
+                 
 
             }
         }
