@@ -10,6 +10,7 @@ const path = require('path');
 
 
 const auth = async (req, res) => {
+    console.log('test authController');
     const { email, password } = req.body;
     let errors = [];
     console.log('email ' + email + ' pass ' + password)
@@ -22,6 +23,7 @@ const auth = async (req, res) => {
         } else {
             const match = await bcrypt.compare(password, foundUser.password);
             if (match) {
+                console.log('match');
                 const accessToken = jwt.sign({
                     "email": foundUser.email,
                 }, process.env.ACESS_TOKEN_SECRET, { expiresIn: '30s' }
@@ -32,8 +34,11 @@ const auth = async (req, res) => {
                     { expiresIn: '1d' }
                 );
                 //store the refresh token with the current user on db 
-                 
+                res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
+                res.json({ accessToken , refreshToken});
 
+            }else {
+                res.sendStatus(401);
             }
         }
     }

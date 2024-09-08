@@ -6,6 +6,9 @@ var indexRouter = require('./routes/index');
 var registerRouter = require('./routes/register');
 var authRouter = require('./routes/auth');
 var logoutRouter = require('./routes/logout');
+var refreshToken = require ('./routes/refresh');
+
+
 const path = require('path');
 
 
@@ -34,6 +37,7 @@ app.listen(
 app.use('/', indexRouter);
 app.use('/register', registerRouter);
 app.use('/auth', authRouter);
+app.use('/refresh',refreshToken);
 app.use('/lgout', logoutRouter);
 
 

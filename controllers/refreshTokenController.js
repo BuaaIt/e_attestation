@@ -6,29 +6,32 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 
-const handleRefreshToken =  (req,res) => {
-    const cookies = req.cookies;
-    if (!cookies?.jwt) return res.sendStatus(401);
-    const refreshToken = cookies.jwt;
+const handleRefreshToken = (req, res) => {
+    
+    //const cookies = req.cookies;
+    //if (!cookies?.jwt) return res.sendStatus(401);
+    const refreshToken = req.body.refreshAccess;
+    console.log('refresh ' + refreshToken);
 
 
-
-const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
+    const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
+    console.log('found user : '+foundUser)
+    
     if (!foundUser) return res.sendStatus(403); //Forbidden 
     // evaluate jwt 
     jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
-            if (err || foundUser.username !== decoded.username) return res.sendStatus(403);
+            if (err || foundUser.email !== decoded.email) return res.sendStatus(403);
+            console.log("decoded "+decoded.email);
             const accessToken = jwt.sign(
-                { "username": decoded.username },
-                process.env.ACCESS_TOKEN_SECRET,
+                { "email": decoded.email },
+                process.env.ACESS_TOKEN_SECRET,
                 { expiresIn: '30s' }
             );
             res.json({ accessToken })
         }
     );
 }
-
 module.exports = { handleRefreshToken }
