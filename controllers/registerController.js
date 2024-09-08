@@ -1,8 +1,8 @@
-const usersDB = {
-    users: require('../model/users'),
-    setUsers: function (data) { this.users = data }
-}
-
+//const usersDB = {
+//    users: require('../model/users'),
+//    setUsers: function (data) { this.users = data }
+//}
+const pool = require('../db');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const fsPromises = require('fs').promises;
@@ -25,17 +25,25 @@ const register= async (req, res) =>{
     }
         
         const hashedPwd = await bcrypt.hash(password1, saltRounds);
-        const newUser = { 
-            "fname": fname,
-            "lname": lname,
-            "email" : email,
-            "password" : hashedPwd         
-            };
-        usersDB.setUsers([...usersDB.users, newUser]);  
-        await fsPromises.writeFile(
-            path.join(__dirname, '..', 'model', 'users.json'),
-           JSON.stringify(usersDB.users)
-        );
+        //const newUser = { 
+         //   "fname": fname,
+         //   "lname": lname,
+         //   "email" : email,
+         //   "password" : hashedPwd         
+         //   };
+            try{
+              await pool.query('INSERT INTO users(fname , lname,email,password) VALUES ($1,$2,$3,$4)',[fname,lname,email,hashedPwd]);
+               res.status(200).send({message :"successfully added"});
+             }catch(err){
+               console.log(err);
+               res.sendStatus(500);
+             }
+
+      //  usersDB.setUsers([...usersDB.users, newUser]);  
+      //  await fsPromises.writeFile(
+      //      path.join(__dirname, '..', 'model', 'users.json'),
+      //     JSON.stringify(usersDB.users)
+      //  );
         res.status(200).send("user added succesfully");
         // Store hash in your password DB.
     

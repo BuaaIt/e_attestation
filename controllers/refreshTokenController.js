@@ -2,29 +2,31 @@ const usersDB = {
     users: require('../model/users.json'),
     setUsers: function (data) { this.users = data }
 }
+const pool = require('../db');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+const handleRefreshToken = async (req, res) => {
 
-const handleRefreshToken = (req, res) => {
-    
     //const cookies = req.cookies;
     //if (!cookies?.jwt) return res.sendStatus(401);
     const refreshToken = req.body.refreshAccess;
     console.log('refresh ' + refreshToken);
 
 
-    const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
-    console.log('found user : '+foundUser)
-    
+    //    const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
+
+    const foundUser = await pool.query("SELECT * FROM  users WHERE refresh_token='" + refreshToken + "'");
+    console.log('found user : ' + foundUser.rows[0])
+
     if (!foundUser) return res.sendStatus(403); //Forbidden 
     // evaluate jwt 
     jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
-            if (err || foundUser.email !== decoded.email) return res.sendStatus(403);
-            console.log("decoded "+decoded.email);
+            if (err || foundUser.rows[0].email !== decoded.email) return res.sendStatus(403);
+            console.log("decoded " + decoded.email);
             const accessToken = jwt.sign(
                 { "email": decoded.email },
                 process.env.ACESS_TOKEN_SECRET,
