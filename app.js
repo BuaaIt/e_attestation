@@ -5,6 +5,7 @@ const port= 8080;
 var indexRouter = require('./routes/index');
 var registerRouter = require('./routes/register');
 var authRouter = require('./routes/auth');
+var compagnieRouter = require('./routes/api/compagnies');
 var logoutRouter = require('./routes/logout');
 var refreshToken = require ('./routes/refresh');
 
@@ -39,6 +40,7 @@ app.use('/register', registerRouter);
 app.use('/auth', authRouter);
 app.use('/refresh',refreshToken);
 app.use('/lgout', logoutRouter);
+app.use('/compagnies', compagnieRouter);
 
 
 
