@@ -34,7 +34,7 @@ const auth = async (req, res) => {
                     console.log('match');
                     const accessToken = jwt.sign({
                         "email": foundUser.rows[0].email,
-                    }, process.env.ACESS_TOKEN_SECRET, { expiresIn: '30s' }
+                    }, process.env.ACESS_TOKEN_SECRET, { expiresIn: '10m' }
                     );
                     const refreshToken = jwt.sign(
                         { "email": foundUser.rows[0].email },
