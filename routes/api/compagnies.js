@@ -4,10 +4,10 @@ const compagnieController = require('../../controllers/compagnieController');
 const verifyJWT = require('../../middleware/verifyJWT');
 router.route('/')
     .get(verifyJWT,compagnieController.getAllCompagnies)
-    .post(compagnieController.createCompagnie)
-    .put(compagnieController.updateCompagnie)
-    .delete(compagnieController.deleteCompagnie);
+    .post(verifyJWT,compagnieController.createCompagnie)
+    .put(verifyJWT,compagnieController.updateCompagnie)
+    .delete(verifyJWT,compagnieController.deleteCompagnie);
 
-router.route('/:id')
-    .get(compagnieController.getAllCompagnies);
+router.route('/:matricule&:police_n')
+    .get(compagnieController.comp);
 module.exports = router;
