@@ -25,7 +25,7 @@ const getAllCompagnies = async (req, res, next) => {
     res.status(201).send(compagnies.rows);
 }
 const createCompagnie = async (req, res, next) => {
-    const { nom, prenom, email, address,n_police } = req.body;
+    const { email, nom, directeur, num_tel,address } = req.body;
     try {
         const url = 'http://localhost:8080/compagnies/'+email+'&'+n_police;
         QRCode.toDataURL(url, async function (err, uurl) {
