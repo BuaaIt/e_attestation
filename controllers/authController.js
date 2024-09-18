@@ -45,10 +45,14 @@ const auth = async (req, res) => {
                     
 
                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
-                    res.json({ accessToken , refreshToken});
-    
+                    res.json({ "status": "200",
+                               "status_message": "User authenticated successfully",
+                        accessToken , refreshToken});
                 }else {
-                    res.sendStatus(401);
+                    res.sendStatus(401).json({
+                        "status":"401",
+                        "status_message":"wrong password"
+                    });
                 }
                
             }

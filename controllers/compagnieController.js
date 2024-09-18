@@ -1,7 +1,8 @@
 const pool = require('../db');
 
 const QRCode = require('qrcode');
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 //test function
 const comp = async (req, res, next) => {
@@ -26,12 +27,13 @@ const getAllCompagnies = async (req, res, next) => {
 }
 const createCompagnie = async (req, res, next) => {
     const { email, nom, directeur, num_tel,address } = req.body;
+    const hashedPwd = await bcrypt.hash("123456", saltRounds);
     try {
         const url = 'http://localhost:8080/compagnies/'+email+'&'+n_police;
         QRCode.toDataURL(url, async function (err, uurl) {
             qrCodeImage = uurl;
             console.log("qr code :"+qrCodeImage);
-            await pool.query("INSERT INTO compagnie (nom,prenom,email,address,n_police,qr_code) VALUES ($1,$2,$3,$4,$5,$6)", [nom, prenom, email, address,n_police,qrCodeImage]);
+            await pool.query("INSERT INTO compagnie (nom,prenom,email,address,n_police,qr_code,password) VALUES ($1,$2,$3,$4,$5,$6,$7)", [nom, prenom, email, address,n_police,qrCodeImage,hashedPwd]);
             res.status(200).send({
                 message: 'compagnie ajouter avec sucess'
             });

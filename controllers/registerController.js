@@ -25,12 +25,6 @@ const register= async (req, res) =>{
     }
         
         const hashedPwd = await bcrypt.hash(password1, saltRounds);
-        //const newUser = { 
-         //   "fname": fname,
-         //   "lname": lname,
-         //   "email" : email,
-         //   "password" : hashedPwd         
-         //   };
             try{
               await pool.query('INSERT INTO users(fname , lname,email,password) VALUES ($1,$2,$3,$4)',[fname,lname,email,hashedPwd]);
                res.status(200).send({message :"successfully added"});
@@ -39,11 +33,6 @@ const register= async (req, res) =>{
                res.sendStatus(500);
              }
 
-      //  usersDB.setUsers([...usersDB.users, newUser]);  
-      //  await fsPromises.writeFile(
-      //      path.join(__dirname, '..', 'model', 'users.json'),
-      //     JSON.stringify(usersDB.users)
-      //  );
         res.status(200).send("user added succesfully");
         // Store hash in your password DB.
     
