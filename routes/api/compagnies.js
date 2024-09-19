@@ -8,6 +8,6 @@ router.route('/')
     .put(verifyJWT,compagnieController.updateCompagnie)
     .delete(verifyJWT,compagnieController.deleteCompagnie);
 
-router.route('/:matricule&:police_n')
-    .get(compagnieController.comp);
+router.route('/:id')
+    .get(compagnieController.getOneCompagnie);
 module.exports = router;

@@ -6,39 +6,75 @@ const saltRounds = 10;
 
 //test function
 const comp = async (req, res, next) => {
-    const {matricule,police_n} = req.params;
+    const { matricule, police_n } = req.params;
     console.log("  test : ");
     //res.send('compagnies '+matricule+" police "+police_n);
 
     console.log('Get  compagnies by matricule and police number  ');
-    const compagnies = await pool.query("SELECT * FROM  compagnie WHERE matricule='"+matricule+"' AND n_police='"+police_n+"'");
+    const compagnies = await pool.query("SELECT * FROM  compagnie WHERE matricule='" + matricule + "' AND n_police='" + police_n + "'");
     console.log('compagnies  ' + compagnies.rows[0]);
     res.status(201).send(compagnies.rows);
+}
 
 
 
+const getOneCompagnie = async (req, res, next) => {
+    const {id}=req.params;
+    console.log('Get one compagnie  ');
+    const compagnie = await pool.query("SELECT id,nom,email,num_tel,address,creation_date,created_by FROM  compagnie where id='"+id+"'");
+    console.log('compagnies  ' + compagnie.rows[0]);
+
+    if(compagnie.rows.length == 0){
+        res.status(201).json({
+            "status":"404",
+            "status_message":"compagnie doesnt exist",
+            "result":"not found",
+            });
+    }else{
+        res.status(201).json({
+            "status":"200",
+            "status_message":"success",
+            "result":compagnie.rows[0],
+            });
+    }
+    
 }
 
 const getAllCompagnies = async (req, res, next) => {
     console.log('Get ALL compagnies  ');
-    const compagnies = await pool.query("SELECT * FROM  compagnie");
+    const compagnies = await pool.query("SELECT id,nom,email,num_tel,address,creation_date,created_by FROM  compagnie");
     console.log('compagnies  ' + compagnies.rows[0]);
-    res.status(201).send(compagnies.rows);
+    if(compagnies.rows.length ==0){
+        res.status(201).json({
+            "status":"404",
+            status_message:"empty ",
+            "result":"no compagnie on the data base",
+            });
+    }else{
+        res.status(201).json({
+            "status":"200",
+            status_message:"success",
+            "result":compagnies.rows,
+            });
+    }
+    
 }
 const createCompagnie = async (req, res, next) => {
-    const { email, nom, directeur, num_tel,address } = req.body;
-    const hashedPwd = await bcrypt.hash("123456", saltRounds);
+    const { id, email, nom, num_tel, address, creation_date, created_by } = req.body;
+
     try {
-        const url = 'http://localhost:8080/compagnies/'+email+'&'+n_police;
-        QRCode.toDataURL(url, async function (err, uurl) {
-            qrCodeImage = uurl;
-            console.log("qr code :"+qrCodeImage);
-            await pool.query("INSERT INTO compagnie (nom,prenom,email,address,n_police,qr_code,password) VALUES ($1,$2,$3,$4,$5,$6,$7)", [nom, prenom, email, address,n_police,qrCodeImage,hashedPwd]);
-            res.status(200).send({
-                message: 'compagnie ajouter avec sucess'
-            });
+        const hashedPwd = await bcrypt.hash("123456", saltRounds);
+        await pool.query("INSERT INTO compagnie (id,email,nom,num_tel,address,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [id, email, nom, num_tel, address, creation_date, created_by, hashedPwd]);
+        res.status(200).json({
+            "status": "200",
+            "status_message": "compagnie created successfully",
         });
     } catch (err) {
+        res.status(200).json({
+            "status": "404",
+            "status_message": "Error",
+            err
+        });
         console.log(err);
     }
 
@@ -69,6 +105,7 @@ const updateCompagnie = async (req, res, next) => {
 
 
 module.exports = {
+    getOneCompagnie,
     getAllCompagnies,
     createCompagnie,
     deleteCompagnie,

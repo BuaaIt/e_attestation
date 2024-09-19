@@ -1,6 +1,8 @@
 var express = require('express'); 
 var app = express(); 
 var models = require('express-cassandra');
+
+
 var myIndex = function () {
     init();
 };

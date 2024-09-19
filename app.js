@@ -12,7 +12,7 @@ var logoutRouter = require('./routes/logout');
 var agencesRouter = require('./routes/api/agences');
 var drRouter = require('./routes/api/dr');
 var refreshToken = require('./routes/refresh');
-
+const cookieParser = require('cookie-parser');
 
 const path = require('path');
 
@@ -29,6 +29,8 @@ var expressLayouts = require('express-ejs-layouts');
 // EJS 
 app.use(expressLayouts);
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

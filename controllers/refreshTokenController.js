@@ -7,10 +7,11 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const handleRefreshToken = async (req, res) => {
-
-    //const cookies = req.cookies;
-    //if (!cookies?.jwt) return res.sendStatus(401);
-    const refreshToken = req.body.refreshAccess;
+    
+    const cookies = req.cookies;
+    console.log("cookiie "+JSON.stringify (req.cookies));
+    if (!cookies?.jwt) return res.sendStatus(401);
+    const refreshToken = cookies.jwt;
     console.log('refresh ' + refreshToken);
 
 
@@ -30,9 +31,11 @@ const handleRefreshToken = async (req, res) => {
             const accessToken = jwt.sign(
                 { "email": decoded.email },
                 process.env.ACESS_TOKEN_SECRET,
-                { expiresIn: '30s' }
+                { expiresIn: '10m' }
             );
-            res.json({ accessToken })
+            res.json({ "status":"200",
+                        "status_message":"Acess token successfully refreshed ",
+                accessToken })
         }
     );
 }

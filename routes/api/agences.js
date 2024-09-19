@@ -8,6 +8,6 @@ router.route('/')
     .put(verifyJWT,agenceController.updateAgencie)
     .delete(verifyJWT,agenceController.deleteAgencie);
 
-router.route('/:matricule&:police_n')
-    .get();
+router.route('/:code')
+    .get(verifyJWT,agenceController.getOneAgence);
 module.exports = router;

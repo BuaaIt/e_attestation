@@ -41,7 +41,7 @@ const auth = async (req, res) => {
                         { expiresIn: '1d' }
                     );
                     //store the refresh token with the current user on db
-                    const updateUser= await pool.query("UPDATE users SET refresh_token='"+refreshToken+"'");
+                    const updateUser= await pool.query("UPDATE users SET refresh_token='"+refreshToken+"' where email='"+email+"'");
                     
 
                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
