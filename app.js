@@ -11,6 +11,7 @@ var drRouter = require('./routes/api/dr');
 var logoutRouter = require('./routes/logout');
 var agencesRouter = require('./routes/api/agences');
 var drRouter = require('./routes/api/dr');
+var attestationRouter=require('./routes/api/attestation');
 var refreshToken = require('./routes/refresh');
 const cookieParser = require('cookie-parser');
 
@@ -49,7 +50,7 @@ app.use('/lgout', logoutRouter);
 app.use('/compagnies', compagnieRouter);
 app.use('/agence', agencesRouter);
 app.use('/dr', drRouter);
-
+app.use('/attestation',attestationRouter);
 
 
 

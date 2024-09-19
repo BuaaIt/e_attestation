@@ -21,14 +21,18 @@ const createAgencie = async (req, res, next) => {
     const {code, directeur, email,address, num_tel, dr,creation_date,created_by } = req.body;
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);    
-        await pool.query("INSERT INTO agence (code,directeur,email,address,num_tel,dr,creation_date,created_by ,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) on conflict (code) do nothing;", [code, directeur, email, address,num_tel,dr,creation_date,created_by ,hashedPwd]);
+        await pool.query("INSERT INTO agence (code,directeur,email,address,num_tel,dr,creation_date,created_by ,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)", [code, directeur, email, address,num_tel,dr,creation_date,created_by ,hashedPwd]);
         res.status(200).json({
             "status": "200",
             "status_message": "agence created successfully",
             
         });
-     
     } catch (err) {
+        res.status(404).json({
+            status:"404",
+            status_message:"un problem ",
+            result:err.detail
+        });
         console.log(err);
     }
 

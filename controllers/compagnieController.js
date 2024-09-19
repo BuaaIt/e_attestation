@@ -70,10 +70,10 @@ const createCompagnie = async (req, res, next) => {
             "status_message": "compagnie created successfully",
         });
     } catch (err) {
-        res.status(200).json({
-            "status": "404",
-            "status_message": "Error",
-            err
+        res.status(404).json({
+            status:"404",
+            status_message:"un problem ",
+            result:err.detail
         });
         console.log(err);
     }

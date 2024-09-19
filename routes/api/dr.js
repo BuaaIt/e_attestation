@@ -8,6 +8,6 @@ router.route('/')
     .put(verifyJWT,drController.updateDr)
     .delete(verifyJWT,drController.deleteDr);
 
-router.route('/:matricule&:police_n')
-    .get();
+router.route('/:code')
+    .get(verifyJWT,drController.getOneDr);
 module.exports = router;

@@ -9,5 +9,5 @@ router.route('/')
     .delete(verifyJWT,compagnieController.deleteCompagnie);
 
 router.route('/:id')
-    .get(compagnieController.getOneCompagnie);
+    .get(verifyJWT,compagnieController.getOneCompagnie);
 module.exports = router;
