@@ -69,8 +69,7 @@ const createPolice = async (req, res, next) => {
     } = req.body;
 
     try {
-        const hashedPwd = await bcrypt.hash("123456", saltRounds);
-        await pool.query("INSERT INTO assure (nin,nom,prenom,address,num_tel) VALUES ($1,$2,$3,$4,$5)", [nin_assure, nom_assure, prenom_assure, address_assure, num_tel]);
+        await pool.query("INSERT INTO assure (nin,nom,prenom,address,num_tel) VALUES ($1,$2,$3,$4,$5) ON CONFLICT  (nin) DO NOTHING;", [nin_assure, nom_assure, prenom_assure, address_assure, num_tel]);
         await pool.query("INSERT INTO police (num_police,date_effet,date_echeance,date_souscription,prime_rc,taux_reduction,duree,assure,agence) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
             [num_police, date_effet, date_echeance, date_souscription, prime_rc, taux_reduction, duree, nin_assure,agence]);
         await pool.query("INSERT INTO conducteur (nom,prenom,nin) VALUES ($1,$2,$3)",
