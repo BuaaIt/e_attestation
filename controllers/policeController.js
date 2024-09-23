@@ -19,10 +19,11 @@ const comp = async (req, res, next) => {
 
 
 const getOnePolice = async (req, res, next) => {
-    const { num_police, matricule,nom_assure, num_chassis} = req.params;
+    const { search_by , search_value} = req.params;
     console.log('Get one attestation  ');
     var sqlQuery;
-    if(typeof num_police !== 'undefined'){
+    // 'np'  ====> numero police
+    if(search_by === 'np'){
         //****************************************************** */
         sqlQuery ="SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
         "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
@@ -33,11 +34,12 @@ const getOnePolice = async (req, res, next) => {
         "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
         "conducteur.nom , conducteur.prenom , conducteur.nin "+
         "FROM vehicule " +
-        "JOIN police ON police.num_police='AB2002' AND vehicule.police=police.num_police " +
+        "JOIN police ON police.num_police='"+search_value+"' AND vehicule.police=police.num_police " +
         "JOIN assure ON police.assure=assure.nin "+
         "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
         //*************************************************************** */
-    }else if(typeof matricule !== 'undefined'){
+        // 'nm'  ====> numero matricule
+    }else if(search_by === 'nm'){
         sqlQuery =        "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
         "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
         "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
@@ -47,11 +49,12 @@ const getOnePolice = async (req, res, next) => {
         "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
         "conducteur.nom , conducteur.prenom , conducteur.nin "+
         "FROM vehicule " +
-        "JOIN police ON vehicule.police=police.num_police " +
+        "JOIN police ON vehicule.police=police.num_police AND vehicule.matricule='"+search_value+"' "+
         "JOIN assure ON police.assure=assure.nin "+
         "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
         //************************************************************* */
-    }else if(typeof nom_assure !== 'undefined'){
+        // 'na'  ====> nom assure
+    }else if(search_by === 'na'){
         sqlQuery =        "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
         "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
         "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
@@ -62,12 +65,12 @@ const getOnePolice = async (req, res, next) => {
         "conducteur.nom , conducteur.prenom , conducteur.nin "+
         "FROM vehicule " +
         "JOIN police ON vehicule.police=police.num_police " +
-        "JOIN assure ON police.assure=assure.nin "+
+        "JOIN assure ON police.assure=assure.nin AND assure.nom='"+search_value+"' "+
         "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
-
         //******************************************************************** */
-    }else if(typeof num_chassis !== 'undefined'){
-        sqlQuery =        "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
+        // 'nc'  ====> numero chassis
+    }else if(search_by === 'nc'){
+        sqlQuery ="SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
         "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
         "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
         "police.num_police, " +
@@ -76,7 +79,7 @@ const getOnePolice = async (req, res, next) => {
         "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
         "conducteur.nom , conducteur.prenom , conducteur.nin "+
         "FROM vehicule " +
-        "JOIN police ON vehicule.police=police.num_police " +
+        "JOIN police ON vehicule.police=police.num_police AND vehichule.num_chassis ='" +search_value+"' "+
         "JOIN assure ON police.assure=assure.nin "+
         "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
     }
@@ -203,6 +206,24 @@ const updatePolice = async (req, res, next) => {
 
 }
 
+
+
+/*
+try {
+    const url = 'http://localhost:8080/compagnies/'+email+'&'+n_police;
+    QRCode.toDataURL(url, async function (err, uurl) {
+        qrCodeImage = uurl;
+        console.log("qr code :"+qrCodeImage);
+        await pool.query("INSERT INTO compagnie (nom,prenom,email,address,n_police,qr_code) VALUES ($1,$2,$3,$4,$5,$6)", [nom, prenom, email, address,n_police,qrCodeImage]);
+        res.status(200).send({
+            message: 'compagnie ajouter avec sucess'
+        });
+    });
+} catch (err) {
+    console.log(err);
+}
+
+*/
 
 
 module.exports = {
