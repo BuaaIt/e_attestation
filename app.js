@@ -13,6 +13,7 @@ var agencesRouter = require('./routes/api/agences');
 var drRouter = require('./routes/api/dr');
 var attestationRouter=require('./routes/api/attestation');
 var vehiculeRouter=require('./routes/api/vehicule');
+var avenantRouter=require('./routes/api/avenant');
 var refreshToken = require('./routes/refresh');
 const cookieParser = require('cookie-parser');
 
@@ -53,6 +54,7 @@ app.use('/agence', agencesRouter);
 app.use('/dr', drRouter);
 app.use('/attestation',attestationRouter);
 app.use('/vehicule', vehiculeRouter);
+app.use('/avenant', avenantRouter);
 
 
 

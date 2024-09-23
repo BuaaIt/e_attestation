@@ -31,10 +31,12 @@ const createVehicule = async (req, res, next) => {
         nbr_places, charge_utile, genre,
         num_chassis, nom_conducteur,
         prenom_conducteur, nin_conducteur,
-        police, tonnage, } = req.body;
+        police, tonnage } = req.body;
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
-        await pool.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places ,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)", [code, directeur, email, address, num_tel, dr, creation_date, created_by, hashedPwd]);
+        await pool.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places ,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+                         [marque, type, annee, valeur,matricule, usage, puissance,
+                            nbr_places, charge_utile, genre,num_chassis, nin_conducteur,police, tonnage]);
         res.status(200).json({
             "status": "200",
             "status_message": "vehicule created successfully",

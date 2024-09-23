@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const policeController = require('../../controllers/policeController');
+const avenantController = require('../../controllers/avenantController');
 const verifyJWT = require('../../middleware/verifyJWT');
 router.route('/')
-    .get(verifyJWT,policeController.getAllPolices)
-    .post(verifyJWT,policeController.createPolice)
-    .put(verifyJWT,policeController.updatePolice)
-    .delete(verifyJWT,policeController.deletePolice);
+    .get(verifyJWT,avenantController.getAllAvenant)
+    .post(verifyJWT,avenantController.createAvenant)
+    .put(verifyJWT,avenantController.updateAvenant)
+    .delete(verifyJWT,avenantController.deleteAvenant);
 
 router.route('/:search_by&:search_value')
-    .get(verifyJWT,policeController.getOnePolice);
+    .get(verifyJWT,avenantController.getOnePolice);
 module.exports = router;
