@@ -51,13 +51,13 @@ const createAgencie = async (req, res, next) => {
         res.status(200).json({
             status:"2001",
             status_message:"success ",
-            result:"DR ajouter avec success"
+            result:"Agence ajouter avec success"
         });
     } catch (err) {
         res.status(400).json({
             status: "4000",
             status_message: "Bas request ",
-            result: err.error
+            result: err.detail
         });
         console.log(err);
     }

@@ -68,13 +68,13 @@ const createCompagnie = async (req, res, next) => {
         res.status(201).json({
             status:"2001",
             status_message:"success ",
-            result:"DR ajouter avec success"
+            result:"Compagnie ajouter avec success"
         });
     } catch (err) {
         res.status(400).json({
             status:"4000",
             status_message:"bad request ",
-            result:err.error
+            result:err.detail
         });
         console.log(err);
     }

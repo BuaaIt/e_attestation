@@ -28,7 +28,7 @@ const getAllDrs = async (req, res, next) => {
     console.log('Get ALL DRs  ');
     const drs = await pool.query("SELECT nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr");
     console.log('dr  ' + drs.rows[0]);
-    if (dr.rows.length == 0) {
+    if (drs.rows.length == 0) {
         res.status(404).json({
             status: "4004",
             status_message: "no data",
