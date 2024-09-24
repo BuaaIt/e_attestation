@@ -50,15 +50,20 @@ const auth = async (req, res) => {
                         accessToken , refreshToken});
                 }else {
                     res.sendStatus(401).json({
-                        "status":"401",
-                        "status_message":"wrong password"
+                        "status":"4001",
+                        "status_message":"wrong user or password"
                     });
                 }
                
             }
            }catch(err){
              console.log(err);
-             res.sendStatus(500);
+             res.status(400).json({
+                status:"4000",
+                status_message:"bad request",
+                result:err.detail
+             });
+             
            }
 
 

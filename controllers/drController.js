@@ -11,15 +11,15 @@ const getOneDr = async (req, res, next) => {
     const dr = await pool.query("SELECT email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr where code='"+code+"'");
     console.log('dr  ' + dr.rows[0]);
     if (dr.rows.length == 0) {
-        res.status(201).json({
-            status: "404",
+        res.status(404).json({
+            status: "4004",
             status_message: "no data",
             result: "no dr"
         });
     } else {
-        res.status(201).json({
-            status: "200",
-            status_message: "success",
+        res.status(200).json({
+            status: "2000",
+            status_message: "Dr ",
             result: dr.rows[0]
         });
     }
@@ -30,15 +30,15 @@ const getAllDrs = async (req, res, next) => {
     const drs = await pool.query("SELECT email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr");
     console.log('dr  ' + drs.rows[0]);
     if (dr.rows.length == 0) {
-        res.status(201).json({
-            status: "404",
+        res.status(404).json({
+            status: "4004",
             status_message: "no data",
-            result: "no dr"
+            result: "pas de dr"
         });
     } else {
-        res.status(201).json({
-            status: "200",
-            status_message: "success",
+        res.status(200).json({
+            status: "2000",
+            status_message: "liste des DRs",
             result: drs.rows
         });
     }
@@ -50,14 +50,16 @@ const createDr = async (req, res, next) => {
     try {
 
         await pool.query("INSERT INTO dr (email, directeur, address,num_tel,code,compagnie,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)", [email, directeur, address, num_tel, code, compagnie, email, directeur, address, num_tel, code, compagnie, creation_date, created_by, hashedPwd]);
-        res.status(200).send({
-            message: 'conducteur ajouter avec sucess'
+        res.status(201).send({
+            status:"2001",
+            status_message:"success ",
+            result:"DR ajouter avec success"
         });
 
     } catch (err) {
-        res.status(404).json({
-            status:"404",
-            status_message:"un problem ",
+        res.status(400).json({
+            status:"4004",
+            status_message:"bad request ",
             result:err.detail
         });
         console.log(err);

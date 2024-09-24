@@ -10,8 +10,23 @@ const getAllVehicules = async (req, res, next) => {
         "FROM  vehicule " +
         "JOIN conducteur ON vehicule.conducteur = conducteur.nin "
     );
+    if (vehicules.rowCount == 0) {
+        res.status(404).json({
+            status: "4004",
+            status_message: "no data",
+            result: vehicules.rows
+        });
+
+    } else {
+        res.status(200).json({
+            status: "2000",
+            status_message: "success",
+            result: vehicules.rows
+        });
+
+    }
     console.log('vehicules  ' + vehicules.rows[0]);
-    res.status(201).send(vehicules.rows);
+
 }
 
 const getOneVehicule = async (req, res, next) => {
@@ -23,6 +38,19 @@ const getOneVehicule = async (req, res, next) => {
         "JOIN conducteur ON vehicule.conducteur = conducteur.nin AND vehicule.matricule='" + matricule + "'"
     );
     console.log('agences  ' + vehicule.rows[0]);
+    if(vehicule.rowCount == 0){
+        res.status(404).json({
+            status:"40004",
+            status_message:"No data",
+            result :vehicule.rows
+        });
+    }else{
+        res.status(200).json({
+            status:"2000",
+            status_message:"success ",
+            result :vehicule.rows
+        });
+    }
     res.status(201).send(vehicule.rows[0]);
 }
 const createVehicule = async (req, res, next) => {
@@ -35,44 +63,44 @@ const createVehicule = async (req, res, next) => {
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
         await pool.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places ,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
-                         [marque, type, annee, valeur,matricule, usage, puissance,
-                            nbr_places, charge_utile, genre,num_chassis, nin_conducteur,police, tonnage]);
-        res.status(200).json({
-            "status": "200",
-            "status_message": "vehicule created successfully",
-
+            [marque, type, annee, valeur, matricule, usage, puissance,
+                nbr_places, charge_utile, genre, num_chassis, nin_conducteur, police, tonnage]);
+        res.status(201).json({
+            "status": "2001",
+            "status_message": "created successfully",
         });
     } catch (err) {
-        res.status(404).json({
-            status: "404",
-            status_message: "un problem ",
+        res.status(401).json({
+            status: "4001",
+            status_message: "bad request ",
             result: err.detail
         });
-        console.log(err);
+        console.log(err.detail);
     }
 
 }
 
 
 const checkVehicule = async (req, res, next) => {
-    const {matricule}= req.params
-const vehicule = await pool.query("SELECT marque,type,annee,valeur,matricule,usage,puissance ," +
-    "nbr_places, charge_utile,genre,num_chassis,conducteur,conducteur.nom,conducteur.prenom " +
-    "FROM  vehicule " +
-    "JOIN conducteur ON vehicule.conducteur = conducteur.nin AND vehicule.matricule='" + matricule + "'"
-);
-if(vehicule.length ==0 ){
-    res.status(404).json({
-        status : "404",
-        status_message:"vehicule non assuré"
-    });
-}else {
-    res.status(200).json({
-        status : "200",
-        status_message:"Vehicule assure",
-        result:vehicule.rows[0]
-    });
-}
+    const { matricule } = req.params
+    const vehicule = await pool.query("SELECT marque,type,annee,valeur,matricule,usage,puissance ," +
+        "nbr_places, charge_utile,genre,num_chassis,conducteur,conducteur.nom,conducteur.prenom " +
+        "FROM  vehicule " +
+        "JOIN conducteur ON vehicule.conducteur = conducteur.nin AND vehicule.matricule='" + matricule + "'"
+    );
+    if (vehicule.length == 0) {
+        res.status(404).json({
+            status: "4004",
+            status_message: "no data",
+            result:"vehicule non assure"
+        });
+    } else {
+        res.status(200).json({
+            status: "2000",
+            status_message: "Vehicule assure",
+            result: vehicule.rows[0]
+        });
+    }
 }
 const deleteVehicule = async (req, res, next) => {
 

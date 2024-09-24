@@ -11,11 +11,19 @@ const createConducteur = async (req, res, next) => {
     try {
         
         await pool.query("INSERT INTO conducteur (nom,prenom,nin) VALUES ($1,$2,$3)", [nom, prenom,nin]);
-        res.status(200).send({
+        res.status(201).send({
+            status:"2001",
+            status_message:"created successfuly",
             message: 'conducteur ajouter avec sucess'
         });
      
     } catch (err) {
+        res.status(400).send({
+            status:"4000",
+            status_message:"bad request",
+            message: err.detail
+        });
+     
         console.log(err);
     }
 

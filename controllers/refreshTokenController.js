@@ -20,7 +20,11 @@ const handleRefreshToken = async (req, res) => {
     const foundUser = await pool.query("SELECT * FROM  users WHERE refresh_token='" + refreshToken + "'");
     console.log('found user : ' + foundUser.rows[0])
 
-    if (!foundUser) return res.sendStatus(403); //Forbidden 
+    if (!foundUser) return res.status(401).json({
+        status:"4001",
+        status_message:"unauthorized",
+        result:"please refresh your token",
+    }); //unauthorized
     // evaluate jwt 
     jwt.verify(
         refreshToken,
@@ -33,9 +37,10 @@ const handleRefreshToken = async (req, res) => {
                 process.env.ACESS_TOKEN_SECRET,
                 { expiresIn: '10m' }
             );
-            res.json({ "status":"200",
-                        "status_message":"Acess token successfully refreshed ",
-                accessToken })
+            res.status(200).json({ 
+                        status:"2000",
+                        status_message:"Acess token successfully refreshed ",
+                        result:accessToken })
         }
     );
 }

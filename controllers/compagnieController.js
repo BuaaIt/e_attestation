@@ -16,7 +16,7 @@ const comp = async (req, res, next) => {
     res.status(201).send(compagnies.rows);
 }
 
-
+//************************************************* */
 
 const getOneCompagnie = async (req, res, next) => {
     const {id}=req.params;
@@ -25,14 +25,14 @@ const getOneCompagnie = async (req, res, next) => {
     console.log('compagnies  ' + compagnie.rows[0]);
 
     if(compagnie.rows.length == 0){
-        res.status(201).json({
-            "status":"404",
-            "status_message":"compagnie doesnt exist",
-            "result":"not found",
+        res.status(404).json({
+            "status":"4004",
+            "status_message":"do not existe",
+            "result":"empty",
             });
     }else{
-        res.status(201).json({
-            "status":"200",
+        res.status(200).json({
+            "status":"2000",
             "status_message":"success",
             "result":compagnie.rows[0],
             });
@@ -45,14 +45,14 @@ const getAllCompagnies = async (req, res, next) => {
     const compagnies = await pool.query("SELECT id,nom,email,num_tel,address,creation_date,created_by FROM  compagnie");
     console.log('compagnies  ' + compagnies.rows[0]);
     if(compagnies.rows.length ==0){
-        res.status(201).json({
-            "status":"404",
+        res.status(404).json({
+            "status":"4004",
             status_message:"empty ",
             "result":"no compagnie on the data base",
             });
     }else{
-        res.status(201).json({
-            "status":"200",
+        res.status(200).json({
+            "status":"2000",
             status_message:"success",
             "result":compagnies.rows,
             });
@@ -65,14 +65,14 @@ const createCompagnie = async (req, res, next) => {
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
         await pool.query("INSERT INTO compagnie (id,email,nom,num_tel,address,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [id, email, nom, num_tel, address, creation_date, created_by, hashedPwd]);
-        res.status(200).json({
-            "status": "200",
+        res.status(201).json({
+            "status": "2001",
             "status_message": "compagnie created successfully",
         });
     } catch (err) {
-        res.status(404).json({
-            status:"404",
-            status_message:"un problem ",
+        res.status(400).json({
+            status:"4000",
+            status_message:"bad request ",
             result:err.detail
         });
         console.log(err);

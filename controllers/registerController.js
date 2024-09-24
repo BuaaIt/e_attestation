@@ -27,10 +27,17 @@ const register= async (req, res) =>{
         const hashedPwd = await bcrypt.hash(password1, saltRounds);
             try{
               await pool.query('INSERT INTO users(fname , lname,email,password) VALUES ($1,$2,$3,$4)',[fname,lname,email,hashedPwd]);
-               res.status(200).send({message :"successfully added"});
+               res.status(201).send({
+                status:"2001",
+                status_message:"",
+                message :"successfully added"});
              }catch(err){
                console.log(err);
-               res.sendStatus(500);
+               res.status(400).json({
+                status:"4000",
+                status_message:"Bad request",
+                result:err.detail,
+               });
              }
 
         res.status(200).send("user added succesfully");

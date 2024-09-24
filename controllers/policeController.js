@@ -76,14 +76,14 @@ const getOnePolice = async (req, res, next) => {
     console.log('compagnies  ' + attestation.rows[0]);
 
     if (attestation.rows.length == 0) {
-        res.status(201).json({
-            "status": "404",
-            "status_message": "attestation doesnt exist",
+        res.status(404).json({
+            "status": "4004",
+            "status_message": "no data",
             "result": "not found",
         });
     } else {
-        res.status(201).json({
-            "status": "200",
+        res.status(200).json({
+            "status": "2000",
             "status_message": "success",
             "result": attestation.rows,
         });
@@ -123,14 +123,14 @@ const avenants = await pool.query(
 );
     
     if (police.rows.length == 0) {
-        res.status(201).json({
-            "status": "404",
-            status_message: "empty ",
+        res.status(404).json({
+            "status": "4004",
+            status_message: "no data ",
             "result": "no compagnie on the data base",
         });
     } else {
-        res.status(201).json({
-            "status": "200",
+        res.status(200).json({
+            "status": "2000",
             status_message: "success",
             "result": police.rows,
         });
@@ -160,9 +160,9 @@ const createPolice = async (req, res, next) => {
             "status_message": "attestation created successfully",
         });
     } catch (err) {
-        res.status(404).json({
-            status: "404",
-            status_message: "un problem ",
+        res.status(400).json({
+            status: "4000",
+            status_message: "Bad reqeust ",
             result: err.detail
         });
         console.log(err);
