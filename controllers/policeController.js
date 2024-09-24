@@ -4,20 +4,6 @@ const QRCode = require('qrcode');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-//test function
-const comp = async (req, res, next) => {
-    const { matricule, police_n } = req.params;
-    console.log("  test : ");
-    //res.send('compagnies '+matricule+" police "+police_n);
-
-    console.log('Get  compagnies by matricule and police number  ');
-    const compagnies = await pool.query("SELECT * FROM  compagnie WHERE matricule='" + matricule + "' AND n_police='" + police_n + "'");
-    console.log('compagnies  ' + compagnies.rows[0]);
-    res.status(201).send(compagnies.rows);
-}
-
-
-
 const getOnePolice = async (req, res, next) => {
     const { search_by , search_value} = req.params;
     console.log('Get one attestation  ');
@@ -232,5 +218,4 @@ module.exports = {
     createPolice,
     deletePolice,
     updatePolice,
-    comp
 }

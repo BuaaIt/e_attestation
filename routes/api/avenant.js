@@ -8,6 +8,6 @@ router.route('/')
     .put(verifyJWT,avenantController.updateAvenant)
     .delete(verifyJWT,avenantController.deleteAvenant);
 
-router.route('/:search_by&:search_value')
-    .get(verifyJWT,avenantController.getOnePolice);
+router.route('/:num_police')
+    .get(verifyJWT,avenantController.getOneAvenant);
 module.exports = router;
