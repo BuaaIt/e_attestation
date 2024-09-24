@@ -66,14 +66,15 @@ const createCompagnie = async (req, res, next) => {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
         await pool.query("INSERT INTO compagnie (id,email,nom,num_tel,address,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [id, email, nom, num_tel, address, creation_date, created_by, hashedPwd]);
         res.status(201).json({
-            "status": "2001",
-            "status_message": "compagnie created successfully",
+            status:"2001",
+            status_message:"success ",
+            result:"DR ajouter avec success"
         });
     } catch (err) {
         res.status(400).json({
             status:"4000",
             status_message:"bad request ",
-            result:err.detail
+            result:err.error
         });
         console.log(err);
     }

@@ -8,7 +8,7 @@ const saltRounds = 10;
 const getOneDr = async (req, res, next) => {
     console.log('Get One Dr  ');
     const {code}=req.params;
-    const dr = await pool.query("SELECT email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr where code='"+code+"'");
+    const dr = await pool.query("SELECT nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr where code='"+code+"'");
     console.log('dr  ' + dr.rows[0]);
     if (dr.rows.length == 0) {
         res.status(404).json({
@@ -24,10 +24,9 @@ const getOneDr = async (req, res, next) => {
         });
     }
 }
-
 const getAllDrs = async (req, res, next) => {
     console.log('Get ALL DRs  ');
-    const drs = await pool.query("SELECT email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr");
+    const drs = await pool.query("SELECT nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr");
     console.log('dr  ' + drs.rows[0]);
     if (dr.rows.length == 0) {
         res.status(404).json({
@@ -45,11 +44,12 @@ const getAllDrs = async (req, res, next) => {
 
 }
 const createDr = async (req, res, next) => {
-    const { email, directeur, address, num_tel, code, compagnie, creation_date, created_by } = req.body;
+    const {nom, email, directeur, address, num_tel, code, compagnie, creation_date, created_by } = req.body;
     const hashedPwd = await bcrypt.hash("123456", saltRounds);
     try {
 
-        await pool.query("INSERT INTO dr (email, directeur, address,num_tel,code,compagnie,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)", [email, directeur, address, num_tel, code, compagnie, email, directeur, address, num_tel, code, compagnie, creation_date, created_by, hashedPwd]);
+        await pool.query("INSERT INTO dr (nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", 
+                        [nom,email, directeur, address, num_tel, code, compagnie, creation_date, created_by, hashedPwd]);
         res.status(201).send({
             status:"2001",
             status_message:"success ",
