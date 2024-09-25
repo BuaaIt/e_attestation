@@ -9,6 +9,22 @@ const getOnePolice = async (req, res, next) => {
     console.log('Get one attestation  ');
     var sqlQuery;
     // 'np'  ====> numero police
+    if(typeof(search_by) === "undefined"){
+        sqlQuery ="SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
+        "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
+        "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
+        "police.num_police, " +
+        "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
+        "police.taux_reduction,police.duree,police.agence," +
+        "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
+        "conducteur.nom , conducteur.prenom , conducteur.nin "+
+        "FROM vehicule " +
+        "JOIN police ON police.num_police='"+search_value+"' AND vehicule.police=police.num_police " +
+        "JOIN assure ON police.assure=assure.nin "+
+        "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
+    }else{
+
+    
     if(search_by === 'np'){
         //****************************************************** */
         sqlQuery ="SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
@@ -69,7 +85,7 @@ const getOnePolice = async (req, res, next) => {
         "JOIN assure ON police.assure=assure.nin "+
         "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
     }
-
+}
     
     
     const attestation = await pool.query(sqlQuery);
@@ -98,7 +114,7 @@ const getAllPolices = async (req, res, next) => {
         "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
         "police.num_police, " +
         "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
-        "police.taux_reduction,police.duree,police.agence," +
+        "police.taux_reduction,police.duree,police.agence,police.qr_code," +
         "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
         "conducteur.nom , conducteur.prenom , conducteur.nin "+
         "FROM vehicule " +
@@ -145,11 +161,13 @@ const createPolice = async (req, res, next) => {
         , matricule, usage_vehicule, puissance_vehicule, nbr_places, cahrge_utile, genre_vehicule
         , num_chassis, tonnage
     } = req.body;
-
+    var qrCodeImage;
+    const url = 'http://192.168.1.3:8080/attestation/'+ num_police;
     try {
+        QRCode.toDataURL(url, async function (err, generatedUrl) {
         await pool.query("INSERT INTO assure (nin,nom,prenom,address,num_tel) VALUES ($1,$2,$3,$4,$5) ON CONFLICT  (nin) DO NOTHING;", [nin_assure, nom_assure, prenom_assure, address_assure, num_tel]);
-        await pool.query("INSERT INTO police (num_police,date_effet,date_echeance,date_souscription,prime_rc,taux_reduction,duree,assure,agence) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
-            [num_police, date_effet, date_echeance, date_souscription, prime_rc, taux_reduction, duree, nin_assure, agence]);
+        await pool.query("INSERT INTO police (num_police,date_effet,date_echeance,date_souscription,prime_rc,taux_reduction,duree,assure,agence,qr_code) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+            [num_police, date_effet, date_echeance, date_souscription, prime_rc, taux_reduction, duree, nin_assure, agence,generatedUrl]);
         await pool.query("INSERT INTO conducteur (nom,prenom,nin) VALUES ($1,$2,$3)",
             [nom_conducteur, prenom_conducteur, nin_conducteur]);
         await pool.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
@@ -159,6 +177,7 @@ const createPolice = async (req, res, next) => {
             "status": "200",
             "status_message": "attestation created successfully",
         });
+    });
     } catch (err) {
         res.status(400).json({
             status: "4000",

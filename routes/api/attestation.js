@@ -10,4 +10,6 @@ router.route('/')
 
 router.route('/:search_by&:search_value')
     .get(verifyJWT,policeController.getOnePolice);
+    router.route('/:search_value')
+    .get(policeController.getOnePolice);
 module.exports = router;
