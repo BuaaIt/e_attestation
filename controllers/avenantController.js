@@ -17,7 +17,7 @@ const getAllAvenant = async (req, res, next) => {
 const getOneAvenant = async (req, res, next) => {
     const { num_police } = req.params;
     console.log('Get one avenant  ' + num_police);
-    const avenant = await pool.query("SELECT id,type,created_by,creation_date, description FROM  avenant where police='" + num_police + "'");
+    const avenant = await pool.query("SELECT id,type,created_by,creation_date, description FROM  avenant where police=$1",[num_police]);
     console.log('avenant  ' + avenant.rows[0]);
    if(avenant.rowCount ==0){
     res.status(404).json({

@@ -35,8 +35,7 @@ const getOneVehicule = async (req, res, next) => {
     const vehicule = await pool.query("SELECT marque,type,annee,valeur,matricule,usage,puissance ," +
         "nbr_places, charge_utile,genre,num_chassis,conducteur,conducteur.nom,conducteur.prenom " +
         "FROM  vehicule " +
-        "JOIN conducteur ON vehicule.conducteur = conducteur.nin AND vehicule.matricule='" + matricule + "'"
-    );
+        "JOIN conducteur ON vehicule.conducteur = conducteur.nin AND vehicule.matricule=$1",[matricule]);
     console.log('agences  ' + vehicule.rows[0]);
     if(vehicule.rowCount == 0){
         res.status(404).json({
@@ -86,7 +85,7 @@ const checkVehicule = async (req, res, next) => {
     const vehicule = await pool.query("SELECT marque,type,annee,valeur,matricule,usage,puissance ," +
         "nbr_places, charge_utile,genre,num_chassis,conducteur,conducteur.nom,conducteur.prenom " +
         "FROM  vehicule " +
-        "JOIN conducteur ON vehicule.conducteur = conducteur.nin AND vehicule.matricule='" + matricule + "'"
+        "JOIN conducteur ON vehicule.conducteur = conducteur.nin AND vehicule.matricule=$1",[matricule]
     );
     if (vehicule.length == 0) {
         res.status(404).json({

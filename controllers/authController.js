@@ -19,7 +19,7 @@ const auth = async (req, res) => {
     } else {// lookup for an existing account
 
         try{
-            const foundUser= await pool.query("SELECT * FROM  users WHERE email='"+email+"'");
+            const foundUser= await pool.query("SELECT * FROM  users WHERE email=$1",[email]);
              //res.status(200).send({
                  children :"successfully got",
                  //data : foundUser

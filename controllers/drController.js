@@ -8,7 +8,7 @@ const saltRounds = 10;
 const getOneDr = async (req, res, next) => {
     console.log('Get One Dr  ');
     const {code}=req.params;
-    const dr = await pool.query("SELECT nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr where code='"+code+"'");
+    const dr = await pool.query("SELECT nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr where code=$1",[code]);
     console.log('dr  ' + dr.rows[0]);
     if (dr.rows.length == 0) {
         res.status(404).json({

@@ -11,7 +11,7 @@ const comp = async (req, res, next) => {
     //res.send('compagnies '+matricule+" police "+police_n);
 
     console.log('Get  compagnies by matricule and police number  ');
-    const compagnies = await pool.query("SELECT * FROM  compagnie WHERE matricule='" + matricule + "' AND n_police='" + police_n + "'");
+    const compagnies = await pool.query("SELECT * FROM  compagnie WHERE matricule=$1 AND n_police=$2",[matricule,police_n]);
     console.log('compagnies  ' + compagnies.rows[0]);
     res.status(201).send(compagnies.rows);
 }
@@ -21,7 +21,7 @@ const comp = async (req, res, next) => {
 const getOneCompagnie = async (req, res, next) => {
     const {id}=req.params;
     console.log('Get one compagnie  ');
-    const compagnie = await pool.query("SELECT id,nom,email,num_tel,address,creation_date,created_by FROM  compagnie where id='"+id+"'");
+    const compagnie = await pool.query("SELECT id,nom,email,num_tel,address,creation_date,created_by FROM  compagnie where id=$1",[id]);
     console.log('compagnies  ' + compagnie.rows[0]);
 
     if(compagnie.rows.length == 0){

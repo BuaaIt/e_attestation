@@ -26,7 +26,7 @@ const getAllAgencies = async (req, res, next) => {
 const getOneAgence = async (req, res, next) => {
     const { code } = req.params;
     console.log('Get one agence  ' + code);
-    const agences = await pool.query("SELECT nom,code,directeur,email,address,num_tel,dr,creation_date ,created_by FROM  agence where code='" + code + "'");
+    const agences = await pool.query("SELECT nom,code,directeur,email,address,num_tel,dr,creation_date ,created_by FROM  agence where code=$1",[code]);
     console.log('agences  ' + agences.rows[0]);
     if (agences.rowCount == 0) {
         res.status(404).json({
