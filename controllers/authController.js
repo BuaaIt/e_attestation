@@ -33,7 +33,8 @@ const auth = async (req, res) => {
                     console.log('match');
                     const accessToken = jwt.sign({
                         "email": foundUser.rows[0].email,
-                    }, process.env.ACESS_TOKEN_SECRET, { expiresIn: '10m' }
+                    }, 
+                    process.env.ACESS_TOKEN_SECRET, { expiresIn: '10m' }
                     );
                     const refreshToken = jwt.sign(
                         { "email": foundUser.rows[0].email },
@@ -43,7 +44,6 @@ const auth = async (req, res) => {
                     //store the refresh token with the current user on db
                     const updateUser= await pool.query("UPDATE users SET refresh_token='"+refreshToken+"' where email='"+email+"'");
                     
-
                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
                     res.json({ "status": "200",
                                "status_message": "User authenticated successfully",

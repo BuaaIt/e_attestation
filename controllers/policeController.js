@@ -8,9 +8,7 @@ const createPolice = async (req, res, next) => {
     const { nin_assure, nom_assure, prenom_assure, address_assure, num_tel
         , num_police, date_effet, date_echeance, date_souscription
         , prime_rc, taux_reduction, duree, agence, nom_conducteur, prenom_conducteur
-        , nin_conducteur, marque_vehicule, type_vehicule, annee_vehicule, valeur_vehicule
-        , matricule, usage_vehicule, puissance_vehicule, nbr_places, cahrge_utile, genre_vehicule
-        , num_chassis, tonnage
+        , nin_conducteur, vehicules
     } = req.body;
 
     const attestation = await pool.connect();
@@ -24,37 +22,39 @@ const createPolice = async (req, res, next) => {
 
 
             ) {
-                try{
-                //begin of transaction
-                await attestation.query('BEGIN');
-                
-                //ajouter assure 
-                await attestation.query("INSERT INTO assure (nin,nom,prenom,address,num_tel) VALUES ($1,$2,$3,$4,$5) ON CONFLICT  (nin) DO NOTHING;",
-                [nin_assure, nom_assure, prenom_assure, address_assure, num_tel]);
-                // ajouter les informations de l'attestation 
-                await attestation.query("INSERT INTO police (num_police,date_effet,date_echeance,date_souscription,prime_rc,taux_reduction,duree,assure,agence,qr_code) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
-                [num_police, date_effet, date_echeance, date_souscription, prime_rc, taux_reduction, duree, nin_assure, agence, generatedUrl]);
-                //ajouter les informations du conducteur
-                await attestation.query("INSERT INTO conducteur (nom,prenom,nin) VALUES ($1,$2,$3) ON CONFLICT  (nin) DO NOTHING;",
-                [nom_conducteur, prenom_conducteur, nin_conducteur]);
-                //ajouter les informations du vehicule
-             //   for(var i =0;i<50;i++){
-                    await attestation.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) ON CONFLICT  (num_chassis) DO NOTHING;",
-                        [marque_vehicule, type_vehicule, annee_vehicule, valeur_vehicule, matricule, usage_vehicule, puissance_vehicule, nbr_places, cahrge_utile, genre_vehicule, num_chassis, nin_conducteur, num_police, tonnage]);
-             //   }             
-                await attestation.query('COMMIT');
-                //json response
-                res.status(200).json({
-                    "status": "200",
-                    "status_message": "attestation created successfully",
-                });}
-                catch(e){
+                try {
+                    //begin of transaction
+                    await attestation.query('BEGIN');
+
+                    //ajouter assure 
+                    await attestation.query("INSERT INTO assure (nin,nom,prenom,address,num_tel) VALUES ($1,$2,$3,$4,$5) ON CONFLICT  (nin) DO NOTHING;",
+                        [nin_assure, nom_assure, prenom_assure, address_assure, num_tel]);
+                    // ajouter les informations de l'attestation 
+                    await attestation.query("INSERT INTO police (num_police,date_effet,date_echeance,date_souscription,prime_rc,taux_reduction,duree,assure,agence,qr_code) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+                        [num_police, date_effet, date_echeance, date_souscription, prime_rc, taux_reduction, duree, nin_assure, agence, generatedUrl]);
+                    //ajouter les informations du conducteur
+                    await attestation.query("INSERT INTO conducteur (nom,prenom,nin) VALUES ($1,$2,$3) ON CONFLICT  (nin) DO NOTHING;",
+                        [nom_conducteur, prenom_conducteur, nin_conducteur]);
+                    //ajouter les informations du vehicule
+                    vehicules.forEach(async (vehicule) => {
+                        console.log("marque vehicule " + vehicule.marque_vehicule);
+                        await attestation.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) ON CONFLICT  (num_chassis) DO NOTHING;",
+                            [vehicule.marque_vehicule, vehicule.type_vehicule, vehicule.annee_vehicule, vehicule.valeur_vehicule, vehicule.matricule, vehicule.usage_vehicule, vehicule.puissance_vehicule, vehicule.nbr_places, vehicule.cahrge_utile, vehicule.genre_vehicule, vehicule.num_chassis, nin_conducteur, num_police, vehicule.tonnage]);
+                    });
+                    await attestation.query('COMMIT');
+                    //json response
+                    res.status(200).json({
+                        "status": "200",
+                        "status_message": "attestation created successfully",
+                    });
+                }
+                catch (e) {
                     await attestation.query('ROLLBACK');
                     throw e;
-                }finally{
+                } finally {
                     attestation.release();
                 }
-            }  
+            }
         });
     } catch (err) {
         res.status(400).json({
@@ -87,8 +87,6 @@ const getOnePolice = async (req, res, next) => {
             "JOIN assure ON police.assure=assure.nin " +
             "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
     } else {
-
-
         if (search_by === 'np') {
             //****************************************************** */
             sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
@@ -103,7 +101,7 @@ const getOnePolice = async (req, res, next) => {
                 "JOIN police ON police.num_police=$1 AND vehicule.police=police.num_police " +
                 "JOIN assure ON police.assure=assure.nin " +
                 "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
-            //*************************************************************** */
+            //*************************************************************** */    
             // 'nm'  ====> numero matricule
         } else if (search_by === 'nm') {
             sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
@@ -151,8 +149,7 @@ const getOnePolice = async (req, res, next) => {
         }
     }
 
-
-    const attestation = await pool.query(sqlQuery,[search_value]);
+    const attestation = await pool.query(sqlQuery, [search_value]);
     console.log('compagnies  ' + attestation.rows[0]);
 
     if (attestation.rows.length == 0) {
