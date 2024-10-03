@@ -210,8 +210,6 @@ const getAllPolices = async (req, res, next) => {
         "FROM police " +
         "JOIN vehicule ON vehicule.police=police.num_police " +
         "JOIN assure ON police.assure=assure.nin "+
-        "JOIN vehicule_conducteur ON vehicule.num_chassis=vehicule_conducteur.num_chassis "+
-        "JOIN conducteur ON  conducteur.nin=vehicule_conducteur.nin_conducteur "+
         "GROUP BY police.num_police" 
     );
    
