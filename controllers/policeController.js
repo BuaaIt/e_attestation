@@ -12,13 +12,13 @@ const createPolice = async (req, res, next) => {
 
     const attestation = await pool.connect();
     var qrCodeImage;
-    const url = 'http://192.168.1.3:8080/attestation/' + num_police;
+    const url = 'http://192.168.1.3:8080/attestation/np&' + num_police;
     try {
         QRCode.toDataURL(url, async function (err, generatedUrl) {
 
-            if (nin_assure != null && nom_assure != null && prenom_assure != null && address_assure != null && num_tel != null
-
-
+            if (nin_assure != null && nom_assure != null && 
+                prenom_assure != null && address_assure != null &&
+                num_tel != null
 
             ) {
                 try {
@@ -38,24 +38,31 @@ const createPolice = async (req, res, next) => {
                     if(Array.isArray(vehicules)){
                         vehicules.forEach(async (vehicule) => {
                             console.log("marque vehicule " + vehicule.marque_vehicule);
-                            await attestation.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) ON CONFLICT (num_chassis) DO NOTHING;",
-                                [vehicule.marque_vehicule, vehicule.type_vehicule, vehicule.annee_vehicule, vehicule.valeur_vehicule, vehicule.matricule, vehicule.usage_vehicule, vehicule.puissance_vehicule, vehicule.nbr_places, vehicule.cahrge_utile, vehicule.genre_vehicule, vehicule.num_chassis, "00111001012", num_police, vehicule.tonnage]);
+                            await attestation.query("INSERT INTO vehicule (marque,type,annee,valeur,matricule,usage,puissance,nbr_places,charge_utile,genre,num_chassis,conducteur,police,tonnage) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
+                                [vehicule.marque_vehicule, vehicule.type_vehicule, vehicule.annee_vehicule, vehicule.valeur_vehicule, vehicule.matricule, vehicule.usage_vehicule, vehicule.puissance_vehicule, vehicule.nbr_places, vehicule.cahrge_utile, vehicule.genre_vehicule, vehicule.num_chassis, "00111001012", num_police, vehicule.tonnage]
+                            
+                            ).catch(e =>{
+                                res.status(401).json({
+                                    status: "4001",
+                                    status_message: 'vehicule deja existe',
+                                    result: "",
+                                });
+                                });
                                 const conducteur =vehicule.conducteur;
                                 if(Array.isArray(conducteur)){
                                     conducteur.forEach(async (cond) => {
                                         await attestation.query("INSERT INTO conducteur (nom,prenom,nin) VALUES ($1,$2,$3) ON CONFLICT  (nin) DO NOTHING;",
                                         [cond.nom_conducteur, cond.prenom_conducteur, cond.nin_conducteur]);
-                                        await attestation.query("INSERT INTO vehicule_conducteur (num_chassis,nin_conducteur) VALUES ($1,$2)",[vehicule.num_chassis,cond.nin_conducteur]);
+                                        await attestation.query("INSERT INTO vehicule_conducteur (num_chassis,nin_conducteur) VALUES ($1,$2) ON CONFLICT (num_chassis,nin_conducteur) DO NOTHING;",[vehicule.num_chassis,cond.nin_conducteur]);
                                     });    
                                 }else{
                                     res.send(400).json({
                                         status:"4000",
                                         status_message:"bad request",
-                                        result:"merci d'entere les donnes de conducteur sous forme de vecteur conducteur : [{data1:data1,data2:data2}]"
+                                        result:"merci d'entere les donnes de conducteur sous forme de vecteur conducteur : [{'data1':data1,'data2':data2}]"
                                     });
                                 }
                             
-                        
                         });
                     }else{
                         res.send(400).json({
@@ -74,12 +81,11 @@ const createPolice = async (req, res, next) => {
                 }
                 catch (e) {
                     await attestation.query('ROLLBACK');
-                    res.status(401).json({
+                        res.status(401).json({
                         status: "4001",
                         status_message: e.detail,
                     });
                     
-                    throw e;
                 } finally {
                     attestation.release();
                 }
@@ -103,7 +109,8 @@ const getOnePolice = async (req, res, next) => {
     var sqlQuery;
     // 'np'  ====> numero police
     if (typeof (search_by) === "undefined") {
-        sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
+
+   /*     sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
             "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
             "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
             "police.num_police, " +
@@ -114,26 +121,41 @@ const getOnePolice = async (req, res, next) => {
             "FROM vehicule " +
             "JOIN police ON police.num_police=$1 AND vehicule.police=police.num_police " +
             "JOIN assure ON police.assure=assure.nin " +
-            "INNER JOIN vehicule_conducteur ON vehicule.num_chassis=vehicule_conducteur.num_chassis";
+            "INNER JOIN vehicule_conducteur ON vehicule.num_chassis=vehicule_conducteur.num_chassis";    */
     } else {
         if (search_by === 'np') {
             //****************************************************** */
-            sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
-                "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
-                "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
-                "police.num_police, " +
-                "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
-                "police.taux_reduction,police.duree,police.agence," +
-                "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
-                "conducteur.nom , conducteur.prenom , conducteur.nin " +
-                "FROM vehicule " +
-                "JOIN police ON police.num_police=$1 AND vehicule.police=police.num_police " +
-                "JOIN assure ON police.assure=assure.nin " +
-                "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
-            //*************************************************************** */    
+
+            sqlQuery= "SELECT police.num_police, " +
+            "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
+            "police.taux_reduction,police.duree,police.agence,police.qr_code, " +
+            "JSON_AGG(json_build_object('marque',vehicule.marque ,'type', vehicule.type,'annee', vehicule.annee , "+
+            "'valeur', vehicule.valeur,'matricule', vehicule.matricule, "+
+            "'usage',vehicule.usage,'puissance', vehicule.puissance,'nbr_places', vehicule.nbr_places ,'charge_utile', vehicule.charge_utile,'genre', vehicule.genre, " +
+            "'num_chassis',vehicule.num_chassis, 'marque', vehicule.tonnage"+
+            ")) as vehicules " +
+            "FROM police " +
+            "JOIN vehicule ON vehicule.police=police.num_police AND police.num_police=$1 " +
+            "JOIN assure ON police.assure=assure.nin "+
+            "GROUP BY police.num_police" ;
+                        //*************************************************************** */    
             // 'nm'  ====> numero matricule
         } else if (search_by === 'nm') {
-            sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
+
+            sqlQuery= "SELECT police.num_police, " +
+            "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
+            "police.taux_reduction,police.duree,police.agence,police.qr_code, " +
+            "JSON_AGG(json_build_object('marque',vehicule.marque ,'type', vehicule.type,'annee', vehicule.annee , "+
+            "'valeur', vehicule.valeur,'matricule', vehicule.matricule, "+
+            "'usage',vehicule.usage,'puissance', vehicule.puissance,'nbr_places', vehicule.nbr_places ,'charge_utile', vehicule.charge_utile,'genre', vehicule.genre, " +
+            "'num_chassis',vehicule.num_chassis, 'marque', vehicule.tonnage"+
+            ")) as vehicules " +
+            "FROM police " +
+            "JOIN vehicule ON vehicule.police=police.num_police AND vehicule.matricule=$1 " +
+            "JOIN assure ON police.assure=assure.nin "+
+            "GROUP BY police.num_police" ;
+
+           /* sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
                 "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
                 "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
                 "police.num_police, " +
@@ -144,37 +166,41 @@ const getOnePolice = async (req, res, next) => {
                 "FROM vehicule " +
                 "JOIN police ON vehicule.police=police.num_police AND vehicule.matricule=$1 " +
                 "JOIN assure ON police.assure=assure.nin " +
-                "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
+                "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";*/
             //************************************************************* */
             // 'na'  ====> nom assure
         } else if (search_by === 'na') {
-            sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
-                "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
-                "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
-                "police.num_police, " +
-                "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
-                "police.taux_reduction,police.duree,police.agence," +
-                "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
-                "conducteur.nom , conducteur.prenom , conducteur.nin " +
-                "FROM vehicule " +
-                "JOIN police ON vehicule.police=police.num_police " +
-                "JOIN assure ON police.assure=assure.nin AND assure.nom=$1 " +
-                "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
+
+            sqlQuery= "SELECT police.num_police, " +
+            "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
+            "police.taux_reduction,police.duree,police.agence,police.qr_code, " +
+            "JSON_AGG(json_build_object('marque',vehicule.marque ,'type', vehicule.type,'annee', vehicule.annee , "+
+            "'valeur', vehicule.valeur,'matricule', vehicule.matricule, "+
+            "'usage',vehicule.usage,'puissance', vehicule.puissance,'nbr_places', vehicule.nbr_places ,'charge_utile', vehicule.charge_utile,'genre', vehicule.genre, " +
+            "'num_chassis',vehicule.num_chassis, 'marque', vehicule.tonnage"+
+            ")) as vehicules " +
+            "FROM police " +
+            "JOIN vehicule ON vehicule.police=police.num_police " +
+            "JOIN assure ON police.assure=assure.nin AND assure.nom=$1 "+
+            "GROUP BY police.num_police" ;
+
             //******************************************************************** */
             // 'nc'  ====> numero chassis
         } else if (search_by === 'nc') {
-            sqlQuery = "SELECT vehicule.marque , vehicule.type, vehicule.annee , vehicule.valeur, vehicule.matricule, " +
-                "vehicule.usage, vehicule.puissance, vehicule.nbr_places , vehicule.charge_utile, vehicule.genre, " +
-                "vehicule.num_chassis, vehicule.conducteur , vehicule.police, vehicule.tonnage ," +
-                "police.num_police, " +
-                "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
-                "police.taux_reduction,police.duree,police.agence," +
-                "assure.nom,assure.prenom,assure.address,assure.nin ,assure.num_tel, " +
-                "conducteur.nom , conducteur.prenom , conducteur.nin " +
-                "FROM vehicule " +
-                "JOIN police ON vehicule.police=police.num_police AND vehichule.num_chassis =$1" +
-                "JOIN assure ON police.assure=assure.nin " +
-                "LEFT JOIN conducteur ON vehicule.conducteur=conducteur.nin";
+
+            sqlQuery= "SELECT police.num_police, " +
+            "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
+            "police.taux_reduction,police.duree,police.agence,police.qr_code, " +
+            "JSON_AGG(json_build_object('marque',vehicule.marque ,'type', vehicule.type,'annee', vehicule.annee , "+
+            "'valeur', vehicule.valeur,'matricule', vehicule.matricule, "+
+            "'usage',vehicule.usage,'puissance', vehicule.puissance,'nbr_places', vehicule.nbr_places ,'charge_utile', vehicule.charge_utile,'genre', vehicule.genre, " +
+            "'num_chassis',vehicule.num_chassis, 'marque', vehicule.tonnage"+
+            ")) as vehicules " +
+            "FROM police " +
+            "JOIN vehicule ON vehicule.police=police.num_police AND vehichule.num_chassis =$1 " +
+            "JOIN assure ON police.assure=assure.nin "+
+            "GROUP BY police.num_police" ;
+         
         }
     }
 
