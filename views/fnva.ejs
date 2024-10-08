@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>BUAA</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<link rel="stylesheet" href="/fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
+		
+		<!-- STYLE CSS -->
+		<link rel="stylesheet" href="/css/style.css">
+	</head>
+
+	<body>
+		<div class="wrapper" style="background-image: url('/images/car.webp');">
+			<div class="inner">				
+				<form action="" class="form-buaa">
+					<div class="d-flex justify-content-center">
+						<img src="/images/buaa.png" class="image-lien" width="120px" height="90px" style="object-fit: fill; margin-right: 100px;">
+						<img src="/images/finance.png" class="image-lien" width="200px" height="90px" style="object-fit: fill; margin-right: 100px;">
+						<img src="/images/uar.png" class="image-lien" width="120px" height="90px" style="object-fit: fill;">
+					  </div>
+					  <br></br>
+					<h3>Fichier Nationnal des Véhicules  Assurés</h3><br></br>
+					<h3>البطاقية الوطنية للمركبات المؤمنة</h3>
+					<fieldset>
+						<legend align="center"> Information Assuré</legend>
+					    <h><label>Nom Assuré :</label> <%= result[0].nom +" "+result[0].prenom %></h><br></br>
+						<h><label>Adresse Assuré :</label> <%= result[0].address%> </h><br></br>
+							</fieldset>
+							<fieldset>
+								
+								<legend align="center"> Information Compagnie</legend>
+								<h><label>Nom Compagnie :</label> CASH</h><br></br>
+                                <h><label>Code d'agence :</label> <%= result[0].agence%></h><br></br>
+								<h><label>Numéro de téléphone:</label> D0263</h><br></br>
+								<h><label>Adresse Agence :</label> 135 Bd des MARTYRS-ALGER </h><br></br>
+						</fieldset>
+						<% for(result[0].ve) %>
+						<fieldset>		
+							<legend align="center"> Information Véhicule</legend>
+							<h><label>Matricule :</label> 082572-00-16</h><br></br>
+							<h><label>Marque :</label> FIAT</h><br></br>
+							<h><label>Modèle:</label> TIPO </h><br></br>
+					</fieldset>
+					<fieldset>
+								
+						<legend align="center"> Information Police d'Assurance</legend>
+						    <h><label>Numéro de police d'assurance :</label> D0203.2024.10.1121.00247</h><br></br>
+							<h><label>Date d'effet police:</label> 04/06/2024</h>
+							&emsp;&emsp;&emsp;&emsp;&emsp;
+							<h style="color:green; font-size: 25px;font-weight: bold;"><label>Assurance:</label> Valide</h><br></br>
+							<h><label>Date d'héchéance police:</label> 03/06/2025</h><br></br>
+							<h><label>Nombre de jour restant de couverture:</label><h id="jours"></h> </h><br></br>
+					</fieldset>
+				</fieldset>
+					
+			
+					<div class="form-end">
+					
+						<div class="button-holder">
+							<button>Declarer un accident</button>
+						</div>
+						<div class="button-holder">
+							
+							<button>Telecharger</button>
+						</div>
+						
+					</div>
+				</form>
+			</div>
+		</div>
+		
+
+		<script>
+const currentDate = new Date();
+const dateEche = new Date("2025-06-03");
+const ageInMilliseconds = dateEche - currentDate  ;
+
+let minutes = Math.floor(ageInMilliseconds / 60000);
+  let hours = Math.round(minutes / 60);
+  let days = Math.round(hours / 24);
+  document.getElementById("jours").innerHTML = days;
+  
+		</script>
+	</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>

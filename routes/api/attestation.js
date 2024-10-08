@@ -9,7 +9,7 @@ router.route('/')
     .delete(verifyJWT,policeController.deletePolice);
 
 router.route('/:search_by&:search_value')
-    .get(verifyJWT,policeController.getOnePolice);
+    .get(policeController.getOnePolice); //verifyJWT
     router.route('/:search_value')
     .get(policeController.getOnePolice);
 module.exports = router;
