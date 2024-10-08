@@ -130,6 +130,7 @@ const getOnePolice = async (req, res, next) => {
                 "police.date_effet,police.date_echeance,police.date_souscription,police.prime_rc," +
                 "police.taux_reduction,police.duree,police.agence,police.qr_code, " +
                 " assure.nom , assure.prenom , assure.address, assure.nin ,assure.num_tel, " +
+                " agence.nom AS nom_agence, compagnie.nom AS nom_compagnie, "+
                 "JSON_AGG(json_build_object('marque',vehicule.marque ,'type', vehicule.type,'annee', vehicule.annee , " +
                 "'valeur', vehicule.valeur,'matricule', vehicule.matricule, " +
                 "'usage',vehicule.usage,'puissance', vehicule.puissance,'nbr_places', vehicule.nbr_places ,'charge_utile', vehicule.charge_utile,'genre', vehicule.genre, " +
@@ -137,8 +138,11 @@ const getOnePolice = async (req, res, next) => {
                 ")) as vehicules " +
                 "FROM police " +
                 "JOIN vehicule ON vehicule.police=police.num_police AND police.num_police=$1 " +
+                "JOIN agence ON police.agence=agence.code "+
+                "JOIN dr ON agence.dr=dr.code "+
+                "JOIN compagnie ON dr.compagnie = compagnie.id "+
                 "JOIN assure ON police.assure=assure.nin " +
-                "GROUP BY police.num_police ,assure.nin ";
+                "GROUP BY police.num_police ,assure.nin , agence.code , compagnie.id ";
             //*************************************************************** */    
             // 'nm'  ====> numero matricule
         } else if (search_by === 'nm') {

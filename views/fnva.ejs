@@ -32,26 +32,28 @@
 							<fieldset>
 								
 								<legend align="center"> Information Compagnie</legend>
-								<h><label>Nom Compagnie :</label> CASH</h><br></br>
+								<h><label>Nom Compagnie :</label> <%=result[0].nom_compagnie%></h><br></br>
                                 <h><label>Code d'agence :</label> <%= result[0].agence%></h><br></br>
 								<h><label>Numéro de téléphone:</label> D0263</h><br></br>
 								<h><label>Adresse Agence :</label> 135 Bd des MARTYRS-ALGER </h><br></br>
 						</fieldset>
-						<% for(result[0].ve) %>
+						<% for(var i =0 ; i<(result[0].vehicules).length ; i++) {
+							let vehicule = (result[0].vehicules)[i] %>
 						<fieldset>		
-							<legend align="center"> Information Véhicule</legend>
-							<h><label>Matricule :</label> 082572-00-16</h><br></br>
-							<h><label>Marque :</label> FIAT</h><br></br>
-							<h><label>Modèle:</label> TIPO </h><br></br>
+							<legend align="center"> Information Véhicule <%=i+1%></legend>
+							<h><label>Matricule :</label> <%=vehicule.matricule %></h><br></br>
+							<h><label>Marque :</label> <%=vehicule.marque %></h><br></br>
+							<h><label>Modèle:</label> <%=vehicule.type %> </h><br></br>
 					</fieldset>
+					<%}%>
 					<fieldset>
 								
 						<legend align="center"> Information Police d'Assurance</legend>
-						    <h><label>Numéro de police d'assurance :</label> D0203.2024.10.1121.00247</h><br></br>
-							<h><label>Date d'effet police:</label> 04/06/2024</h>
+						    <h><label>Numéro de police d'assurance :</label> <%=result[0].num_police %></h><br></br>
+							<h><label>Date d'effet police:</label> <%=result[0].date_effet %></h>
 							&emsp;&emsp;&emsp;&emsp;&emsp;
 							<h style="color:green; font-size: 25px;font-weight: bold;"><label>Assurance:</label> Valide</h><br></br>
-							<h><label>Date d'héchéance police:</label> 03/06/2025</h><br></br>
+							<h><label>Date d'héchéance police:</label> <%=result[0].date_echeance%></h><br></br>
 							<h><label>Nombre de jour restant de couverture:</label><h id="jours"></h> </h><br></br>
 					</fieldset>
 				</fieldset>
