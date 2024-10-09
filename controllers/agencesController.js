@@ -20,7 +20,6 @@ const getAllAgencies = async (req, res, next) => {
             result: agences.rows
         });
     }
-
 }
 
 const getOneAgence = async (req, res, next) => {
