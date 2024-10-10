@@ -22,6 +22,7 @@ const getAllAgencies = async (req, res, next) => {
     }
 }
 
+
 const getOneAgence = async (req, res, next) => {
     const { code } = req.params;
     console.log('Get one agence  ' + code);

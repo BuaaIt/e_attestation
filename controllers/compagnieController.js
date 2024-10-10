@@ -21,7 +21,7 @@ const comp = async (req, res, next) => {
 const getOneCompagnie = async (req, res, next) => {
     const {id}=req.params;
     console.log('Get one compagnie  ');
-    const compagnie = await pool.query("SELECT id,nom,email,num_tel,address,creation_date,created_by FROM  compagnie where id=$1",[id]);
+    const compagnie = await pool.query("SELECT code,nom,email,num_tel,address,creation_date,created_by FROM  compagnie where code=$1",[id]);
     console.log('compagnies  ' + compagnie.rows[0]);
 
     if(compagnie.rows.length == 0){
@@ -42,7 +42,7 @@ const getOneCompagnie = async (req, res, next) => {
 
 const getAllCompagnies = async (req, res, next) => {
     console.log('Get ALL compagnies  ');
-    const compagnies = await pool.query("SELECT id,nom,email,num_tel,address,creation_date,created_by FROM  compagnie");
+    const compagnies = await pool.query("SELECT code,nom,email,num_tel,address,creation_date,created_by FROM compagnie");
     console.log('compagnies  ' + compagnies.rows[0]);
     if(compagnies.rows.length ==0){
         res.status(404).json({
@@ -64,7 +64,7 @@ const createCompagnie = async (req, res, next) => {
 
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
-        await pool.query("INSERT INTO compagnie (id,email,nom,num_tel,address,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [id, email, nom, num_tel, address, creation_date, created_by, hashedPwd]);
+        await pool.query("INSERT INTO compagnie (code,email,nom,num_tel,address,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [id, email, nom, num_tel, address, creation_date, created_by, hashedPwd]);
         res.status(201).json({
             status:"2001",
             status_message:"success ",

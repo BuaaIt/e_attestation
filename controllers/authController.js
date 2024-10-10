@@ -19,7 +19,7 @@ const auth = async (req, res) => {
     } else {// lookup for an existing account
 
         try{
-            const foundUser= await pool.query("SELECT * FROM  users WHERE email=$1",[email]);
+            const foundUser= await pool.query("SELECT * FROM  compte WHERE username=$1",[email]);
              //res.status(200).send({
                  children :"successfully got",
                  //data : foundUser
@@ -42,7 +42,7 @@ const auth = async (req, res) => {
                         { expiresIn: '1d' }
                     );
                     //store the refresh token with the current user on db
-                    const updateUser= await pool.query("UPDATE users SET refresh_token='"+refreshToken+"' where email='"+email+"'");
+                    const updateUser= await pool.query("UPDATE compte SET refresh_token=$1 where username=$2",[refreshToken,email]);
                     
                     res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
                     res.json({ "status": "200",

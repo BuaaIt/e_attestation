@@ -1,8 +1,5 @@
 const pool = require('../db');
 
-
-
-
 const getAllAssure = async (req, res, next) => {
     console.log('Get ALL assure  ');
     const assures = await pool.query("SELECT * FROM  assure");

@@ -23,10 +23,11 @@ const register= async (req, res) =>{
     if (password1.length < 6) {
       errors.push({ msg: 'password at least 6 characters' });
     }
-        
+        let nom = fname + lname;
+        let today_date=new Date();
         const hashedPwd = await bcrypt.hash(password1, saltRounds);
             try{
-              await pool.query('INSERT INTO users(fname , lname,email,password) VALUES ($1,$2,$3,$4)',[fname,lname,email,hashedPwd]);
+              await pool.query('INSERT INTO compte(nom ,email,password,creation_date,created_by) VALUES ($1,$2,$3,$4,$5)',[nom,email,hashedPwd,today_date.toISOString().slice(0,10),"developper"]);
                res.status(201).send({
                 status:"2001",
                 status_message:"",
