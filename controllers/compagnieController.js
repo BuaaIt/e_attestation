@@ -37,13 +37,12 @@ const getOneCompagnie = async (req, res, next) => {
             "result":compagnie.rows[0],
             });
     }
-    
 }
 
 const getAllCompagnies = async (req, res, next) => {
     console.log('Get ALL compagnies  ');
     const compagnies = await pool.query("SELECT code,nom,email,num_tel,address,creation_date,created_by FROM compagnie");
-    console.log('compagnies  ' + compagnies.rows[0]);
+    console.log('compagnies  '+compagnies.rows[0]);
     if(compagnies.rows.length ==0){
         res.status(404).json({
             "status":"4004",
@@ -61,26 +60,32 @@ const getAllCompagnies = async (req, res, next) => {
 }
 const createCompagnie = async (req, res, next) => {
     const { id, email, nom, num_tel, address, creation_date, created_by } = req.body;
-
+    const compagnie= await pool.connect();
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
-        await pool.query("INSERT INTO compagnie (code,email,nom,num_tel,address,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", [id, email, nom, num_tel, address, creation_date, created_by, hashedPwd]);
-        res.status(201).json({
+        await compagnie.query('BEGIN');
+        await compagnie.query("INSERT INTO compagnie (code,email,nom,num_tel,address,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+             [id, email, nom, num_tel, address, creation_date, created_by, hashedPwd]);
+             await compagnie.query("INSERT INTO compte (username,code_structure,password,role,creation_date,created_by) VALUES ($1,$2,$3,$4,$5,$6)",
+                [email,id, hashedPwd, 'compagnie', creation_date, created_by]);
+             await compagnie.query('COMMIT');
+             res.status(201).json({
             status:"2001",
             status_message:"success ",
             result:"Compagnie ajouter avec success"
         });
     } catch (err) {
+        await compagnie.query('ROLLBACK');
         res.status(400).json({
             status:"4000",
             status_message:"bad request ",
             result:err.detail
         });
         console.log(err);
+    }finally{
+        compagnie.release();
     }
-
 }
-
 const deleteCompagnie = async (req, res, next) => {
 
 

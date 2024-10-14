@@ -32,7 +32,6 @@ const createPolice = async (req, res, next) => {
                     await attestation.query("INSERT INTO police (num_police,date_effet,date_echeance,date_souscription,prime_rc,taux_reduction,duree,assure,agence,qr_code) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
                         [num_police, date_effet, date_echeance, date_souscription, prime_rc, taux_reduction, duree, nin_assure, agence, generatedUrl]);
                     //ajouter les informations du conducteur
-
                     //ajouter les informations du vehicule
                     //verifier le format de variable vehicule
                     if (Array.isArray(vehicules)) {

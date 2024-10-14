@@ -46,23 +46,29 @@ const getAllDrs = async (req, res, next) => {
 const createDr = async (req, res, next) => {
     const {nom, email, directeur, address, num_tel, code, compagnie, creation_date, created_by } = req.body;
     const hashedPwd = await bcrypt.hash("123456", saltRounds);
+    const drPool=await pool.connect();
     try {
-
-        await pool.query("INSERT INTO dr (nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", 
+        await drPool.query('BEGIN');
+        await drPool.query("INSERT INTO dr (nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", 
                         [nom,email, directeur, address, num_tel, code, compagnie, creation_date, created_by, hashedPwd]);
-        res.status(201).send({
+        await drPool.query('COMMIT');
+            
+            res.status(201).send({
             status:"2001",
             status_message:"success ",
             result:"DR ajouter avec success"
         });
 
     } catch (err) {
+        await drPool.query('ROLLBACK');
         res.status(400).json({
             status:"4004",
             status_message:"bad request ",
             result:err.detail
         });
         console.log(err);
+    }finally{
+        drPool.release();
     }
 
 }
