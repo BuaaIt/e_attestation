@@ -15,11 +15,10 @@ const handleRefreshToken = async (req, res) => {
     console.log('refresh ' + refreshToken);
 
 
-    //    const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
-
-    const foundUser = await pool.query("SELECT * FROM  users WHERE refresh_token='" + refreshToken + "'");
+    //const foundUser = usersDB.users.find(person => person.refreshToken === refreshToken);
+    
+    const foundUser = await pool.query("SELECT * FROM  compte WHERE refresh_token=$1",[refreshToken]);
     console.log('found user : ' + foundUser.rows[0])
-
     if (!foundUser) return res.status(401).json({
         status:"4001",
         status_message:"unauthorized",

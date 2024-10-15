@@ -8,7 +8,7 @@ const saltRounds = 10;
 const getOneDr = async (req, res, next) => {
     console.log('Get One Dr  ');
     const {code}=req.params;
-    const dr = await pool.query("SELECT nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr where code=$1",[code]);
+    const dr = await pool.query("SELECT nom,email, directeur, adresse,num_tel,code,compagnie,creation_date,created_by FROM  dr where code=$1",[code]);
     console.log('dr  ' + dr.rows[0]);
     if (dr.rows.length == 0) {
         res.status(404).json({
@@ -26,7 +26,7 @@ const getOneDr = async (req, res, next) => {
 }
 const getAllDrs = async (req, res, next) => {
     console.log('Get ALL DRs  ');
-    const drs = await pool.query("SELECT nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by FROM  dr");
+    const drs = await pool.query("SELECT nom,email, directeur, adresse,num_tel,code,compagnie,creation_date,created_by FROM  dr");
     console.log('dr  ' + drs.rows[0]);
     if (drs.rows.length == 0) {
         res.status(404).json({
@@ -44,13 +44,13 @@ const getAllDrs = async (req, res, next) => {
 
 }
 const createDr = async (req, res, next) => {
-    const {nom, email, directeur, address, num_tel, code, compagnie, creation_date, created_by } = req.body;
+    const {nom, email, directeur, adresse, num_tel, code, compagnie, creation_date, created_by } = req.body;
     const hashedPwd = await bcrypt.hash("123456", saltRounds);
     const drPool=await pool.connect();
     try {
         await drPool.query('BEGIN');
-        await drPool.query("INSERT INTO dr (nom,email, directeur, address,num_tel,code,compagnie,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", 
-                        [nom,email, directeur, address, num_tel, code, compagnie, creation_date, created_by, hashedPwd]);
+        await drPool.query("INSERT INTO dr (nom,email, directeur, adresse,num_tel,code,compagnie,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", 
+                        [nom,email, directeur, adresse, num_tel, code, compagnie, creation_date, created_by, hashedPwd]);
         await drPool.query('COMMIT');
             
             res.status(201).send({
@@ -79,9 +79,9 @@ const deleteDr = async (req, res, next) => {
 }
 const updateDr = async (req, res, next) => {
     const query = '';
-    const { nom, prenom, email, address } = req.body;
+    const { nom, prenom, email, adresse } = req.body;
     try {
-        await pool.query("INSERT INTO conducteur (nom,prenom,email,address) VALUES ($1,$2,$3,$4)", [nom, prenom, email, address]);
+        await pool.query("INSERT INTO conducteur (nom,prenom,email,adresse) VALUES ($1,$2,$3,$4)", [nom, prenom, email, adresse]);
         res.status(200).send({
             message: 'conducteur ajouter avec sucess'
         })

@@ -5,7 +5,7 @@ const saltRounds = 10;
 
 const getAllAgencies = async (req, res, next) => {
     console.log('Get ALL agences  ');
-    const agences = await pool.query("SELECT nom,code,directeur,email,address,num_tel,dr,creation_date ,created_by FROM  agence");
+    const agences = await pool.query("SELECT nom,code,directeur,email,adresse,num_tel,dr,creation_date ,created_by FROM  agence");
     console.log('agences  ' + agences.rows[0]);
     if (agences.rowCount == 0) {
         res.status(201).json({
@@ -25,7 +25,7 @@ const getAllAgencies = async (req, res, next) => {
 const getOneAgence = async (req, res, next) => {
     const { code } = req.params;
     console.log('Get one agence  ' + code);
-    const agences = await pool.query("SELECT nom,code,directeur,email,address,num_tel,dr,creation_date ,created_by FROM  agence where code=$1", [code]);
+    const agences = await pool.query("SELECT nom,code,directeur,email,adresse,num_tel,dr,creation_date ,created_by FROM  agence where code=$1", [code]);
     console.log('agences  ' + agences.rows[0]);
     if (agences.rowCount == 0) {
         res.status(404).json({
@@ -42,14 +42,14 @@ const getOneAgence = async (req, res, next) => {
     }
 
 }
-const createAgencie = async (req, res, next) => {
-    const { nom, code, directeur, email, address, num_tel, dr, creation_date, created_by } = req.body;
+
+const newAgence = async (nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by) => {
     const agence = await pool.connect();
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
         await agence.query('BEGIN');
-        await agence.query("INSERT INTO agence (nom,code,directeur,email,address,num_tel,dr,creation_date,created_by ,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
-            [nom, code, directeur, email, address, num_tel, dr, creation_date, created_by, hashedPwd]);
+        await agence.query("INSERT INTO agence (nom,code,directeur,email,adresse,num_tel,dr,creation_date,created_by ,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+            [nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by, hashedPwd]);
         await agence.query("INSERT INTO compte (username,code_structure,password,role,creation_date,created_by) VALUES ($1,$2,$3,$4,$5,$6)",
             [email, code, hashedPwd, 'agence', creation_date, created_by]);
         await agence.query('COMMIT');
@@ -71,13 +71,30 @@ const createAgencie = async (req, res, next) => {
         agence.release();
     }
 
+};
+
+const createAgencie = async (req, res, next) => {
+    const requests = req.body;
+
+    if (Array.isArray(requests)) {
+        for (var i = 0; i < requests.length; i++) {
+            newAgence(requests[i].nom, requests[i].code, requests[i].directeur, requests[i].email,
+                requests[i].adresse, requests[i].num_tel, requests[i].dr, requests[i].creation_date,
+                requests[i].created_by);
+        }
+    } else {
+        const { nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by } = req.body;
+        newAgence(nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by);
+    }
+
+
 }
 
 const deleteAgencie = async (req, res, next) => {
 
     const { code } = req.body;
     try {
-        await pool.query("DELETE from agence (code,directeur,email,address,num_tel,dr,password) VALUES ($1,$2,$3,$4,$5,$6,$7)", [code, directeur, email, address, num_tel, dr, hashedPwd]);
+        await pool.query("DELETE from agence (code,directeur,email,adresse,num_tel,dr,password) VALUES ($1,$2,$3,$4,$5,$6,$7)", [code, directeur, email, adresse, num_tel, dr, hashedPwd]);
         res.status(200).json({
             status: "2001",
             status_message: "success ",
@@ -96,9 +113,9 @@ const deleteAgencie = async (req, res, next) => {
 }
 const updateAgencie = async (req, res, next) => {
     const query = '';
-    const { nom, prenom, email, address } = req.body;
+    const { nom, prenom, email, adresse } = req.body;
     try {
-        await pool.query("INSERT INTO agence (nom,prenom,email,address) VALUES ($1,$2,$3,$4)", [nom, prenom, email, address]);
+        await pool.query("INSERT INTO agence (nom,prenom,email,adresse) VALUES ($1,$2,$3,$4)", [nom, prenom, email, adresse]);
         res.status(201).send({
             status: "2001",
             status_message: 'compagnie created successfully'
