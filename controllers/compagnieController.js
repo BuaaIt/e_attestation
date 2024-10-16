@@ -58,32 +58,60 @@ const getAllCompagnies = async (req, res, next) => {
     }
     
 }
-const createCompagnie = async (req, res, next) => {
-    const { code, email, nom, num_tel, adresse,mobile,fax, creation_date, created_by } = req.body;
-    const compagnie= await pool.connect();
+
+
+const newComp=async(req,res,code,email,nom,num_tel,adresse,mobile,fax,creation_date,created_by)=>{
+    
     try {
         const hashedPwd = await bcrypt.hash("123456", saltRounds);
-        await compagnie.query('BEGIN');
-        await compagnie.query("INSERT INTO compagnie (code,email,nom,num_tel,adresse,mobile,fax,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+
+        await pool.query("INSERT INTO compagnie (code,email,nom,num_tel,adresse,mobile,fax,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
              [code, email, nom, num_tel, adresse,mobile,fax, creation_date, created_by, hashedPwd]);
-             await compagnie.query("INSERT INTO compte (username,code_structure,password,role,creation_date,created_by) VALUES ($1,$2,$3,$4,$5,$6)",
-                [email,code, hashedPwd, 'compagnie', creation_date, created_by]);
-             await compagnie.query('COMMIT');
-             res.status(201).json({
-            status:"2001",
-            status_message:"success ",
-            result:"Compagnie ajouter avec success"
-        });
+          
     } catch (err) {
-        await compagnie.query('ROLLBACK');
         res.status(400).json({
             status:"4000",
             status_message:"bad request ",
             result:err.detail
         });
         console.log(err);
-    }finally{
-        compagnie.release();
+    }
+}
+const createCompagnie = async (req, res, next) => {
+    const request = req.body;
+    try {
+    if(Array.isArray(request)){
+        console.log("arraaaay ");
+        for(var i =0;i<request.length;i++){
+            console.log("  ++   "+request[i].code);
+            await pool.query("INSERT INTO compagnie (code,email,nom,num_tel,adresse,mobile,fax,creation_date,created_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
+                [request[i].code,request[i].email,request[i].nom,request[i].num_tel,
+                request[i].adresse,request[i].mobile,request[i].fax,request[i].creation_date,request[i].created_by]
+            );
+        }
+        res.status(201).json({
+            status:"2001",
+            status_message:"success ",
+            result:"Compagnie ajouter avec success"
+        });
+    }else{
+        console.log('no arrraay');
+        const {code,email,nom,num_tel,adresse,mobile,fax,creation_date,created_by}=req.body;
+        await pool.query("INSERT INTO compagnie (code,email,nom,num_tel,adresse,mobile,fax,creation_date,created_by,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
+            [code, email, nom, num_tel, adresse,mobile,fax, creation_date, created_by, hashedPwd]);
+        res.status(201).json({
+            status:"2001",
+            status_message:"success ",
+            result:"Compagnie(s) ajouter avec success"
+        });
+    } 
+} catch (err) {
+        res.status(400).json({
+            status:"4000",
+            status_message:"bad request ",
+            result:err.detail
+        });
+        console.log(err);
     }
 }
 const deleteCompagnie = async (req, res, next) => {

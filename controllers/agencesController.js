@@ -1,7 +1,4 @@
 const pool = require('../db');
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-
 
 const getAllAgencies = async (req, res, next) => {
     console.log('Get ALL agences  ');
@@ -43,55 +40,30 @@ const getOneAgence = async (req, res, next) => {
 
 }
 
-const newAgence = async (req,res,nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by) => {
-    const agence = await pool.connect();
-    try {
-        const hashedPwd = await bcrypt.hash("123456", saltRounds);
-        await agence.query('BEGIN');
-        await agence.query("INSERT INTO agence (nom,code,directeur,email,adresse,num_tel,dr,creation_date,created_by ,password) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
-            [nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by, hashedPwd]);
-        await agence.query("INSERT INTO compte (username,code_structure,password,creation_date,created_by) VALUES ($1,$2,$3,$4,$5)",
-            [email, code, hashedPwd, creation_date, created_by]);
-        await agence.query('COMMIT');
-
-        res.status(200).json({
-            status: "2001",
-            status_message: "success ",
-            result: "Agence ajouter avec success"
-        });
-    } catch (err) {
-        await agence.query('ROLLBACK');
-        res.status(400).json({
-            status: "4000",
-            status_message: "mauvaise requette ",
-            result: err.detail
-        });
-        console.log(err);
-    } finally {
-        agence.release();
-    }
-
-};
-
 const createAgencie = async (req, res, next) => {
     const requests = req.body;
-
+    try{
     if (Array.isArray(requests)) {
         for (var i = 0; i < requests.length; i++) {
-            newAgence(req, res,requests[i].nom, requests[i].code, requests[i].directeur, requests[i].email,
+            await pool.query("INSERT INTO agence (nom,code,directeur,email,adresse,num_tel,dr,creation_date,created_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
+            [requests[i].nom, requests[i].code, requests[i].directeur, requests[i].email,
                 requests[i].adresse, requests[i].num_tel, requests[i].dr, requests[i].creation_date,
-                requests[i].created_by);
+                requests[i].created_by]);
         }
     } else {
         const { nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by } = req.body;
-        newAgence(req, res,nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by);
+        await pool.query("INSERT INTO agence (nom,code,directeur,email,adresse,num_tel,dr,creation_date,created_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
+            [nom, code, directeur, email, adresse, num_tel, dr, creation_date, created_by]);
     }
-
-
+}catch(err){
+    res.status(400).json({
+        status: "4000",
+        status_message: "mauvaise requette ",
+        result: err.detail
+    });
 }
-
+}
 const deleteAgencie = async (req, res, next) => {
-
     const { code } = req.body;
     try {
         await pool.query("DELETE from agence (code,directeur,email,adresse,num_tel,dr,password) VALUES ($1,$2,$3,$4,$5,$6,$7)", [code, directeur, email, adresse, num_tel, dr, hashedPwd]);
